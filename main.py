@@ -1,5 +1,6 @@
 import argparse
 import os
+from detect_video import detect
 
 parser = argparse.ArgumentParser()
 
@@ -18,5 +19,6 @@ gpu = True if gpu is not None and gpu == '1' else False
 weightsPath = os.path.sep.join([args["config"], "yolov3.weights"])
 configPath = os.path.sep.join([args["config"], "yolov3.cfg"])
 
+detect(inputPath, outputPath, configPath, weightsPath, gpu)
 
 
