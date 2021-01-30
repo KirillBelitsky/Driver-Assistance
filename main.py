@@ -12,7 +12,7 @@ parser.add_argument('--gpu', required=False, help='GPU Cuda must be used (0 - no
 args = vars(parser.parse_args())
 
 inputPath = args['input']
-outputPath = args['input']
+outputPath = args['output']
 gpu = args['gpu']
 gpu = True if gpu is not None and gpu == '1' else False
 
