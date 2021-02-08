@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 
 
 def initializeVideoWriter(videoStream, videoWidth, videoHeight, outputPath):
@@ -24,6 +25,29 @@ def initializeNet(configPath, weightsPath, useGPU):
     return net, ln
 
 
+def processLayerOutputs(layerOutputs, videoWidth, videoHeight, minConfidence=0.3):
+    boxes = [], confidences = [], classIds = []
+
+    for layerOutput in layerOutputs:
+        for i, detection in enumerate(layerOutput):
+            scores = detection[5:]
+            classID = np.argmax(scores)
+            confidence = scores[classID]
+
+            if confidence > minConfidence:
+                box = detection[0:4] * np.array([videoWidth, videoHeight, videoWidth, videoHeight])
+                (centerX, centerY, width, height) = box.astype('int')
+
+                x = int(centerX - (width / 2))
+                y = int(centerY - (height / 2))
+
+                boxes.append([x, y, int(width), int(height)])
+                confidences.append(confidence)
+                classIds.append(classID)
+
+    return boxes, confidences, classIds
+
+
 def detect(inputPath, outputPath, configPath, weightsPath, gpu=False):
 
     videoStream = cv2.VideoCapture(inputPath)
@@ -46,9 +70,16 @@ def detect(inputPath, outputPath, configPath, weightsPath, gpu=False):
         print('FRAME ' + str(framesCount))
 
         (grabbed, frame) = videoStream.read()
-
         if not grabbed:
             break
+
+        blob = cv2.dnn.blobForImage(frame, 1/255.0, (videoWidth, videoHeight),
+                                    swapRB=True, crop=False)
+        net.setInput(blob)
+        layerOutputs = net.forward(ln)
+
+        boxes, confidences, classIds = processLayerOutputs(layerOutputs, videoWidth, videoHeight)
+        idxs = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.3)
 
         cv2.imshow('Frame', frame)
         videoWriter.write(frame)

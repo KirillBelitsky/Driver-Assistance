@@ -1,3 +1,5 @@
 # Project exclude paths
 /venv/
 *.weights
+*.mp4
+*.avi
