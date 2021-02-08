@@ -1,5 +1,21 @@
 import cv2
 import numpy as np
+from util.util import getRandomRGDColors
+
+
+def drawBoxes(idxs, boxes, classIds, confidences, frame):
+    if len(idxs) == 0:
+        return
+
+    colors = getRandomRGDColors()
+    for i in idxs.flatten():
+        (x, y) = (boxes[i][0], boxes[i][1])
+        (width, height) = (boxes[i][2], boxes[i][3])
+
+        color = [int(value) for value in colors[classIds[i]]]
+        cv2.rectangle(frame, (x, y), (x + width,y + height), color, 2)
+        text = '{}: {:.4f}'.format('car', confidences[i])
+        cv2.putText(frame, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
 
 def initializeVideoWriter(videoStream, videoWidth, videoHeight, outputPath):
@@ -26,7 +42,7 @@ def initializeNet(configPath, weightsPath, useGPU):
 
 
 def processLayerOutputs(layerOutputs, videoWidth, videoHeight, minConfidence=0.3):
-    boxes = [], confidences = [], classIds = []
+    boxes, confidences, classIds = [], [], []
 
     for layerOutput in layerOutputs:
         for i, detection in enumerate(layerOutput):
@@ -42,7 +58,7 @@ def processLayerOutputs(layerOutputs, videoWidth, videoHeight, minConfidence=0.3
                 y = int(centerY - (height / 2))
 
                 boxes.append([x, y, int(width), int(height)])
-                confidences.append(confidence)
+                confidences.append(float(confidence))
                 classIds.append(classID)
 
     return boxes, confidences, classIds
@@ -73,13 +89,15 @@ def detect(inputPath, outputPath, configPath, weightsPath, gpu=False):
         if not grabbed:
             break
 
-        blob = cv2.dnn.blobForImage(frame, 1/255.0, (videoWidth, videoHeight),
+        blob = cv2.dnn.blobFromImage(frame, 1/255.0, (416, 416),
                                     swapRB=True, crop=False)
         net.setInput(blob)
         layerOutputs = net.forward(ln)
 
         boxes, confidences, classIds = processLayerOutputs(layerOutputs, videoWidth, videoHeight)
         idxs = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.3)
+
+        drawBoxes(idxs, boxes, classIds, confidences, frame)
 
         cv2.imshow('Frame', frame)
         videoWriter.write(frame)
