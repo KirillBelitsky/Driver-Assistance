@@ -6,6 +6,12 @@ def getRandomRGBColors(colorsAmount=100):
     return np.random.randint(0, 255, size=(colorsAmount, 3), dtype="uint8")
 
 
+def readClasses(inputPath):
+    with open(inputPath) as file:
+        classNames = file.readlines()
+    return [c.strip() for c in classNames]
+
+
 def scale_abs(x, m=255):
     x = np.absolute(x)
     x = np.uint8(m * x / np.max(x))
