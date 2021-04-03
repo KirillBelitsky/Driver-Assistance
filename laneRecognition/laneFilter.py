@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from helpers import scale_abs
+from util.util import scale_abs
 
 
 class LaneFilter:
