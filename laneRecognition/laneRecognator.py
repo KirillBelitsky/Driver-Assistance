@@ -4,7 +4,7 @@ import cv2
 from birdsEye import BirdsEye
 from laneFilter import LaneFilter
 from curves import Curves
-from util.util import roi
+from util.util import roi, getCalibrationProperties
 
 
 source_points = [(650, 450), (190, 720), (1250, 720), (870, 450)]
@@ -17,7 +17,10 @@ p = {'sat_thresh': 120, 'light_thresh': 40, 'light_thresh_agr': 205,
 class LaneRecognator:
 
     def __init__(self):
-        self.birdsEye = BirdsEye()
+        matrix, distortion_coef = getCalibrationProperties('../config/calibration_data.p')
+
+        self.birdsEye = BirdsEye(source_points, destination_points,
+                                 matrix, distortion_coef)
         self.laneFilter = LaneFilter(p)
         self.curves = Curves(number_of_windows=9, margin=100, minimum_pixels=50,
                                 ym_per_pix=30/720, xm_per_pix=3.7/700)
@@ -34,6 +37,7 @@ class LaneRecognator:
         text_pos = "vehicle position: " + result['vehicle_position_words']
         text_l = "left radius: " + str(np.round(result['left_radius'], 2))
         text_r = " right radius: " + str(np.round(result['right_radius'], 2))
+
         cv2.putText(ground_img_with_projection, text_l, (20, 40), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 0), 2)
         cv2.putText(ground_img_with_projection, text_r, (400, 40), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 0), 2)
         cv2.putText(ground_img_with_projection, text_pos, (20, 80), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 0), 2)

@@ -1,4 +1,5 @@
 # Project exclude paths
+/.idea
 /venv/
 *.weights
 *.mp4

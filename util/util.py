@@ -1,4 +1,5 @@
 import numpy as np
+import pickle
 
 
 def getRandomRGBColors(colorsAmount=100):
@@ -10,6 +11,13 @@ def readClasses(inputPath):
     with open(inputPath) as file:
         classNames = file.readlines()
     return [c.strip() for c in classNames]
+
+
+def getCalibrationProperties(inputPath):
+    calibration_data = pickle.load(open(inputPath, "rb"))
+    matrix = calibration_data['camera_matrix']
+    distortion_coef = calibration_data['distortion_coefficient']
+    return matrix, distortion_coef
 
 
 def scale_abs(x, m=255):
