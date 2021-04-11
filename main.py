@@ -1,6 +1,6 @@
 import argparse
 import os
-from detectVideo import detect
+from detector import Detector
 
 parser = argparse.ArgumentParser()
 
@@ -19,6 +19,7 @@ gpu = True if gpu is not None and gpu == '1' else False
 weightsPath = os.path.sep.join([args["config"], "yolov4-tiny.weights"])
 configPath = os.path.sep.join([args["config"], "yolov4-tiny.cfg"])
 
-detect(inputPath, outputPath, configPath, weightsPath, gpu)
+detector = Detector()
+detector.detect(inputPath, outputPath, configPath, weightsPath, gpu)
 
 
