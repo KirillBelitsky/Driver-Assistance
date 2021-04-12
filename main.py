@@ -16,10 +16,11 @@ outputPath = args['output']
 gpu = args['gpu']
 gpu = True if gpu is not None and gpu == '1' else False
 
-weightsPath = os.path.sep.join([args["config"], "yolov4-tiny.weights"])
-configPath = os.path.sep.join([args["config"], "yolov4-tiny.cfg"])
+weightsPath = os.path.sep.join([args["config"], 'yolov4-tiny.weights'])
+configPath = os.path.sep.join([args["config"], 'yolov4-tiny.cfg'])
+classesPath = os.path.sep.join([args["config"], 'coco-classes.txt'])
 
 detector = Detector()
-detector.detect(inputPath, outputPath, configPath, weightsPath, gpu)
+detector.detect(inputPath, outputPath, configPath, weightsPath, classesPath, gpu)
 
 
