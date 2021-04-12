@@ -2,18 +2,18 @@ import numpy as np
 import pickle
 
 
-def getRandomRGBColors(colorsAmount=100):
+def get_random_RGB_colors(colorsAmount=100):
     np.random.seed(42)
     return np.random.randint(0, 255, size=(colorsAmount, 3), dtype="uint8")
 
 
-def readClasses(inputPath):
+def read_classes(inputPath):
     with open(inputPath) as file:
         classNames = file.readlines()
     return [c.strip() for c in classNames]
 
 
-def getCalibrationProperties(inputPath):
+def get_calibration_properties(inputPath):
     calibration_data = pickle.load(open(inputPath, "rb"))
     matrix = calibration_data['camera_matrix']
     distortion_coef = calibration_data['distortion_coefficient']

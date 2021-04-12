@@ -1,5 +1,5 @@
-from dispatchers.eventDispatcher import EventDispatcher
-from listeners.closeEventListener import CloseEventListener
+from events.dispatchers.eventDispatcher import EventDispatcher
+from events.listeners.closeEventListener import CloseEventListener
 from singleton.singletonMeta import SingletonMeta
 
 

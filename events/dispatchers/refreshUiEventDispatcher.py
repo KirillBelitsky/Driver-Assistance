@@ -1,5 +1,5 @@
-from dispatchers.eventDispatcher import EventDispatcher
-from listeners.refreshUiEventListener import RefreshUiEventListener
+from events.dispatchers.eventDispatcher import EventDispatcher
+from events.listeners.refreshUiEventListener import RefreshUiEventListener
 from singleton.singletonMeta import SingletonMeta
 
 

@@ -1,4 +1,4 @@
-from listeners.eventListener import EventListener
+from events.listeners.eventListener import EventListener
 
 
 class CloseEventListener(EventListener):
