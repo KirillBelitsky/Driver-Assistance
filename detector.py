@@ -1,9 +1,11 @@
 import threading
+import time
 
 import cv2
 import numpy as np
 
 from events.dispatchers.refreshUiEventDispatcher import RefreshUiEventDispatcher
+from services.videoHelper import VideoHelper
 from util.util import get_random_RGB_colors, read_classes
 from carDetection.yolo import Yolo
 from laneRecognition.laneRecognator import LaneRecognator
@@ -25,12 +27,10 @@ class Detector:
             text = '{}: {:.4f}'.format(classes[classIds[i]], confidences[i])
             cv2.putText(frame, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
-    def initialize_video_writer(self, videoStream, videoWidth, videoHeight, outputPath):
-        sourceFPS = videoStream.get(cv2.CAP_PROP_FPS)
-        fourcc = cv2.VideoWriter_fourcc(*"MJPG")
-
-        return cv2.VideoWriter(outputPath, fourcc, sourceFPS,
-                               (videoWidth, videoHeight), True)
+    def calculate_fps(self, prev_time):
+        cur_time = time.time()
+        fps = 1 / (cur_time - prev_time)
+        return fps, cur_time
 
     def detect(self, inputPath, outputPath,
                configPath='../config/yolov4-tiny.cfg',
@@ -38,30 +38,26 @@ class Detector:
                classesPath='../config/coco-classes.txt',
                gpu=False):
 
-        videoStream = cv2.VideoCapture(inputPath)
+        video_helper = VideoHelper(inputPath, outputPath)
 
-        if not videoStream.isOpened():
+        if not video_helper.is_video_stream_opened():
             print('Camera or video is not opened!')
             return
 
-        videoWidth = int(videoStream.get(cv2.CAP_PROP_FRAME_WIDTH))
-        videoHeight = int(videoStream.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        videoWriter = self.initialize_video_writer(videoStream, videoWidth,
-                                              videoHeight, outputPath)
-
         classes = read_classes(classesPath)
-        yolo = Yolo(configPath, weightsPath, videoHeight, videoWidth, gpu)
+
+        video_size = video_helper.get_video_size()
+        yolo = Yolo(configPath, weightsPath, video_size[0], video_size[1], gpu)
 
         lane_recognator = LaneRecognator()
         refresh_ui_dispatcher = RefreshUiEventDispatcher()
 
-        framesCount = 0
+        frames_count = 0
+        prev_frame_time = 0
 
         while True:
-            framesCount += 1
-            print('FRAME ' + str(framesCount))
 
-            (grabbed, frame) = videoStream.read()
+            (grabbed, frame) = video_helper.read_frame()
             if not grabbed or getattr(threading.currentThread(), 'stop_process', False):
                 break
 
@@ -73,16 +69,20 @@ class Detector:
 
             self.draw_boxes(idxs, boxes, classIds, classes, confidences, lane_recognized_image)
 
+            fps, prev_time = self.calculate_fps(prev_frame_time)
+            prev_frame_time = prev_time
+            frames_count += 1
+            print('FRAME: %s, FPS: %s' % (str(frames_count), str(np.round(fps, 2))))
+
             refresh_ui_dispatcher.dispatch(result)
 
-            # cv2.imshow('Frame', laneRecognizedImage)
-            # videoWriter.write(laneRecognizedImage)
+            # cv2.imshow('Frame', lane_recognized_image)
+            # video_helper.write_frame(lane_recognized_image)
 
             # if cv2.waitKey(1) & 0xFF == ord('q'):
             #     break
 
         print('Finished')
 
-        videoStream.release()
-        videoWriter.release()
+        video_helper.destroy_streams()
         cv2.destroyAllWindows()
