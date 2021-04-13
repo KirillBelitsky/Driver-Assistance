@@ -28,8 +28,8 @@ class DetectVideoWindow(QMainWindow):
         self.init_button_listeners()
 
     def __del__(self):
-        self.closeEventDispatcher.unregister(self.transformator)
-        self.refreshUiEventDispatcher.unregister(self.transformator)
+        self.closeEventDispatcher.unregister(self.detectAdapter)
+        self.refreshUiEventDispatcher.unregister(self.detectAdapter)
 
     def init_button_listeners(self):
         self.ui.stopButton.clicked.connect(self.on_click_stopButton)
