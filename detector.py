@@ -1,7 +1,10 @@
+import threading
+
 import cv2
 import numpy as np
 
-from util.util import getRandomRGBColors, readClasses
+from events.dispatchers.refreshUiEventDispatcher import RefreshUiEventDispatcher
+from util.util import get_random_RGB_colors, read_classes
 from carDetection.yolo import Yolo
 from laneRecognition.laneRecognator import LaneRecognator
 
@@ -12,7 +15,7 @@ class Detector:
         if len(idxs) == 0:
             return
 
-        colors = getRandomRGBColors()
+        colors = get_random_RGB_colors()
         for i in idxs.flatten():
             (x, y) = (boxes[i][0], boxes[i][1])
             (width, height) = (boxes[i][2], boxes[i][3])
@@ -29,7 +32,11 @@ class Detector:
         return cv2.VideoWriter(outputPath, fourcc, sourceFPS,
                                (videoWidth, videoHeight), True)
 
-    def detect(self, inputPath, outputPath, configPath, weightsPath, gpu=False):
+    def detect(self, inputPath, outputPath,
+               configPath='../config/yolov4-tiny.cfg',
+               weightsPath='../config/yolov4-tiny.weights',
+               classesPath='../config/coco-classes.txt',
+               gpu=False):
 
         videoStream = cv2.VideoCapture(inputPath)
 
@@ -42,10 +49,11 @@ class Detector:
         videoWriter = self.initialize_video_writer(videoStream, videoWidth,
                                               videoHeight, outputPath)
 
-        classes = readClasses('config/coco-classes.txt')
+        classes = read_classes(classesPath)
         yolo = Yolo(configPath, weightsPath, videoHeight, videoWidth, gpu)
 
-        laneRecognator = LaneRecognator()
+        lane_recognator = LaneRecognator()
+        refresh_ui_dispatcher = RefreshUiEventDispatcher()
 
         framesCount = 0
 
@@ -54,22 +62,24 @@ class Detector:
             print('FRAME ' + str(framesCount))
 
             (grabbed, frame) = videoStream.read()
-            if not grabbed:
+            if not grabbed or getattr(threading.currentThread(), 'stop_process', False):
                 break
 
             boxes, confidences, classIds = yolo.detect(frame)
             idxs = yolo.getNMSBoxes(boxes, confidences)
 
             frameForLane = np.copy(frame)
-            laneRecognizedImage = laneRecognator.pipeline(frameForLane)
+            lane_recognized_image, result = lane_recognator.pipeline(frameForLane)
 
-            self.draw_boxes(idxs, boxes, classIds, classes, confidences, laneRecognizedImage)
+            self.draw_boxes(idxs, boxes, classIds, classes, confidences, lane_recognized_image)
 
-            cv2.imshow('Frame', laneRecognizedImage)
-            videoWriter.write(laneRecognizedImage)
+            refresh_ui_dispatcher.dispatch(result)
 
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+            # cv2.imshow('Frame', laneRecognizedImage)
+            # videoWriter.write(laneRecognizedImage)
+
+            # if cv2.waitKey(1) & 0xFF == ord('q'):
+            #     break
 
         print('Finished')
 
