@@ -70,6 +70,7 @@ class Detector:
             self.draw_boxes(idxs, boxes, classIds, classes, confidences, lane_recognized_image)
 
             fps, prev_time = self.calculate_fps(prev_frame_time)
+            result.update({'fps': fps})
             prev_frame_time = prev_time
             frames_count += 1
             print('FRAME: %s, FPS: %s' % (str(frames_count), str(np.round(fps, 2))))
@@ -77,7 +78,7 @@ class Detector:
             refresh_ui_dispatcher.dispatch(result)
 
             # cv2.imshow('Frame', lane_recognized_image)
-            # video_helper.write_frame(lane_recognized_image)
+            video_helper.write_frame(lane_recognized_image)
 
             # if cv2.waitKey(1) & 0xFF == ord('q'):
             #     break
