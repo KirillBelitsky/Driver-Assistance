@@ -47,7 +47,7 @@ class Detector:
         classes = read_classes(classesPath)
 
         video_size = video_helper.get_video_size()
-        yolo = Yolo(configPath, weightsPath, video_size[0], video_size[1], gpu)
+        yolo = Yolo(configPath, weightsPath, video_size[1], video_size[0], gpu)
 
         lane_recognator = LaneRecognator()
         refresh_ui_dispatcher = RefreshUiEventDispatcher()

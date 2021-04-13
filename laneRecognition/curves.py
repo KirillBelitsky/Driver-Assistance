@@ -20,6 +20,7 @@ class Curves:
         self.left_fit_curve_f, self.right_fit_curve_f = None, None
         self.left_radius, self.right_radius = None, None
         self.vehicle_position, self.vehicle_position_words = None, None
+        self.direction = None
         self.result = {}
 
     def store_details(self, binary):
@@ -66,6 +67,20 @@ class Curves:
     def pixel_locations(self, indices):
         return self.all_pixels_x[indices], self.all_pixels_y[indices]
 
+    def define_direction(self, xls, xrs):
+        lx = np.trunc(xls)
+        rx = np.trunc(xrs)
+
+        lx = lx[::-1]  # Reverse to match top-to-bottom in y
+        rx = rx[::-1]  # Reverse to match top-to-bottom in y
+
+        if lx[0] - lx[-1] > 60:
+            self.direction = 'Left'
+        elif lx[-1] - lx[0] > 60:
+            self.direction = 'Right'
+        else:
+            self.direction = 'Straight'
+
     def plot(self, t=4):
 
         self.out_img[self.left_pixels_y, self.left_pixels_x] = [255, 0, 255]
@@ -81,6 +96,8 @@ class Curves:
         right_xs = kr[0] * (ys ** 2) + kr[1] * ys + kr[2]
 
         xls, xrs, ys = left_xs.astype(np.uint32), right_xs.astype(np.uint32), ys.astype(np.uint32)
+
+        self.define_direction(xls, xrs)
 
         for xl, xr, y in zip(xls, xrs, ys):
             try:
@@ -165,7 +182,8 @@ class Curves:
             'pixel_left_best_fit_curve': self.left_fit_curve_pix,
             'pixel_right_best_fit_curve': self.right_fit_curve_pix,
             'vehicle_position': self.vehicle_position,
-            'vehicle_position_words': self.vehicle_position_words
+            'vehicle_position_words': self.vehicle_position_words,
+            'direction': self.direction
         }
 
         return self.result
