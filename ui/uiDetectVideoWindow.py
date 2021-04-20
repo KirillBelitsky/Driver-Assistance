@@ -3,46 +3,35 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_DetectVideoWindow(object):
 
-    def setupUi(self, mainWindow):
-        mainWindow.setObjectName("detectVideoWindow")
-        mainWindow.setFixedSize(1190, 580)
-        self.centralwidget = QtWidgets.QWidget(mainWindow)
+    def setupUi(self, detectVideoWindow):
+        detectVideoWindow.setObjectName("detectVideoWindow")
+        detectVideoWindow.setFixedSize(1190, 580)
+        self.centralwidget = QtWidgets.QWidget(detectVideoWindow)
         self.centralwidget.setObjectName("centralwidget")
 
-        self.initButtons()
-        self.initBars(mainWindow)
-        self.initLabels()
+        self.__initButtons()
+        self.__initLabels()
 
-        mainWindow.setCentralWidget(self.centralwidget)
+        detectVideoWindow.setCentralWidget(self.centralwidget)
 
-        self.retranslateUi(mainWindow)
-        QtCore.QMetaObject.connectSlotsByName(mainWindow)
+        self.retranslateUi(detectVideoWindow)
+        QtCore.QMetaObject.connectSlotsByName(detectVideoWindow)
 
-    def retranslateUi(self, mainWindow):
+    def retranslateUi(self, detectVideoWindow):
         _translate = QtCore.QCoreApplication.translate
-        mainWindow.setWindowTitle(_translate("detectVideoWindow", "Driver-Assistance"))
+        detectVideoWindow.setWindowTitle(_translate("detectVideoWindow", "Driver-Assistance"))
         self.stopButton.setText(_translate("detectVideoWindow", "Stop"))
         self.statisticLabel.setText(_translate("detectVideoWindow", "Statistic"))
         self.fpsLabel.setText(_translate("detectVideoWindow", "FPS:"))
         self.positionLabel.setText(_translate("detectVideoWindow", "Position:"))
         self.directionLabel.setText(_translate("detectVideoWindow", "Direction:"))
 
-    def initButtons(self):
+    def __initButtons(self):
         self.stopButton = QtWidgets.QPushButton(self.centralwidget)
         self.stopButton.setGeometry(QtCore.QRect(1010, 520, 89, 25))
         self.stopButton.setObjectName("stopButton")
 
-    def initBars(self, mainWindow):
-        self.menubar = QtWidgets.QMenuBar(mainWindow)
-        self.menubar.setEnabled(True)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1190, 22))
-        self.menubar.setObjectName("menubar")
-        mainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(mainWindow)
-        self.statusbar.setObjectName("statusbar")
-        mainWindow.setStatusBar(self.statusbar)
-
-    def initLabels(self):
+    def __initLabels(self):
         self.statisticLabel = QtWidgets.QLabel(self.centralwidget)
         self.statisticLabel.setGeometry(QtCore.QRect(1010, 10, 121, 41))
         font = QtGui.QFont()

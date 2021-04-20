@@ -5,10 +5,10 @@ from scipy.misc import imresize  # scipy 1.2.2
 from laneRecognition.birdsEye import BirdsEye
 from laneRecognition.laneFilter import LaneFilter
 from laneRecognition.curves import Curves
-from util.util import roi, get_calibration_properties
+from util.util import Util
 
-source_points = [(660, 450), (200, 720), (1250, 720), (870, 450)]
-#source_points = [(580, 460), (205, 720), (1110, 720), (703, 460)]
+#source_points = [(660, 450), (200, 720), (1250, 720), (870, 450)]
+source_points = [(580, 460), (205, 720), (1110, 720), (703, 460)]
 destination_points = [(320, 0), (320, 720), (960, 720), (960, 0)]
 
 p = {'sat_thresh': 120, 'light_thresh': 40, 'light_thresh_agr': 205,
@@ -18,7 +18,7 @@ p = {'sat_thresh': 120, 'light_thresh': 40, 'light_thresh_agr': 205,
 class LaneRecognator:
 
     def __init__(self):
-        matrix, distortion_coef = get_calibration_properties('../config/calibration_data.p')
+        matrix, distortion_coef = Util.get_calibration_properties('../config/calibration_data.p')
 
         self.birdsEye = BirdsEye(source_points, destination_points,
                                  matrix, distortion_coef)
@@ -29,19 +29,13 @@ class LaneRecognator:
     def pipeline(self, img):
         ground_img = self.birdsEye.undistort(img)
         binary = self.laneFilter.apply(ground_img)
-        wb = np.logical_and(self.birdsEye.sky_view(binary), roi(binary)).astype(np.uint8)
+        wb = np.logical_and(self.birdsEye.sky_view(binary), Util.roi(binary)).astype(np.uint8)
         result = self.curves.fit(wb)
         ground_img_with_projection = self.birdsEye.project(ground_img, binary,
                                                            result['pixel_left_best_fit_curve'],
                                                            result['pixel_right_best_fit_curve'])
 
-        text_pos = "vehicle position: " + result['vehicle_position_words']
-        text_l = "left radius: " + str(np.round(result['left_radius'], 2))
-        text_r = " right radius: " + str(np.round(result['right_radius'], 2))
-
-        cv2.putText(ground_img_with_projection, text_l, (20, 40), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 0), 2)
-        cv2.putText(ground_img_with_projection, text_r, (400, 40), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 0), 2)
-        cv2.putText(ground_img_with_projection, text_pos, (20, 80), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 0), 2)
+        self.__add_addit_info(ground_img_with_projection, result, False)
 
         result.update({'result_image': ground_img_with_projection})
 
@@ -63,13 +57,7 @@ class LaneRecognator:
         pro_img[:height, offset[2]: offset[2] + width] = s_img
         pro_img[:height, offset[3]: offset[3] + width] = cu_img
 
-        text_pos = "vehicle pos: " + result['vehicle_position_words']
-        text_l = "left r: " + str(np.round(result['left_radius'], 2))
-        text_r = " right r: " + str(np.round(result['right_radius'], 2))
-
-        cv2.putText(pro_img, text_l, (20, 220), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 0), 2)
-        cv2.putText(pro_img, text_r, (250, 220), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 0), 2)
-        cv2.putText(pro_img, text_pos, (620, 220), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 0), 2)
+        self.__add_addit_info(pro_img, result, True)
 
         result.update({'result_image': pro_img})
 
@@ -83,7 +71,7 @@ class LaneRecognator:
         sobel_img = self.birdsEye.sky_view(self.laneFilter.sobel_breakdown(ground_img))
         color_img = self.birdsEye.sky_view(self.laneFilter.color_breakdown(ground_img))
 
-        wb = np.logical_and(self.birdsEye.sky_view(binary_img), roi(binary_img)).astype(np.uint8)
+        wb = np.logical_and(self.birdsEye.sky_view(binary_img), Util.roi(binary_img)).astype(np.uint8)
         result = self.curves.fit(wb)
 
         left_curve = result['pixel_left_best_fit_curve']
@@ -94,3 +82,17 @@ class LaneRecognator:
         projected_img = self.birdsEye.project(ground_img, binary_img, left_curve, right_curve)
 
         return birdseye_img, sobel_img, color_img, curve_debug_img, projected_img, result
+
+    def __add_addit_info(self, img, result, is_debug):
+        text_pos = "vehicle pos: " + result['vehicle_position_words']
+        text_l = "left r: " + str(np.round(result['left_radius'], 2))
+        text_r = " right r: " + str(np.round(result['right_radius'], 2))
+
+        if not is_debug:
+            cv2.putText(img, text_l, (20, 40), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 0), 2)
+            cv2.putText(img, text_r, (400, 40), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 0), 2)
+            cv2.putText(img, text_pos, (20, 80), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 0), 2)
+        else:
+            cv2.putText(img, text_l, (20, 220), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 0), 2)
+            cv2.putText(img, text_r, (250, 220), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 0), 2)
+            cv2.putText(img, text_pos, (620, 220), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 0), 2)

@@ -14,10 +14,9 @@ class Yolo:
         self.net = None
         self.ln = None
 
-        self.initializeNet()
+        self.initialize_net()
 
-
-    def initializeNet(self):
+    def initialize_net(self):
         print('Loading YOLO')
 
         self.net = cv2.dnn.readNetFromDarknet(self.config_path, self.weights_path)
@@ -29,26 +28,24 @@ class Yolo:
         self.ln = self.net.getLayerNames()
         self.ln = [self.ln[i[0] - 1] for i in self.net.getUnconnectedOutLayers()]
 
-
     def detect(self, frame):
         blob = cv2.dnn.blobFromImage(frame, 1 / 255.0, (416, 416),
                                      swapRB=True, crop=False)
         self.net.setInput(blob)
-        layerOutputs = self.net.forward(self.ln)
+        layer_outputs = self.net.forward(self.ln)
 
-        return self.processLayerOutputs(layerOutputs)
+        return self.process_layer_outputs(layer_outputs)
 
-
-    def processLayerOutputs(self, layerOutputs, minConfidence=0.3):
+    def process_layer_outputs(self, layer_outputs, min_confidence=0.3):
         boxes, confidences, classIds = [], [], []
 
-        for layerOutput in layerOutputs:
-            for i, detection in enumerate(layerOutput):
+        for layer_output in layer_outputs:
+            for i, detection in enumerate(layer_output):
                 scores = detection[5:]
                 classID = np.argmax(scores)
                 confidence = scores[classID]
 
-                if confidence > minConfidence:
+                if confidence > min_confidence:
                     box = detection[0:4] * np.array([self.video_width, self.video_height, self.video_width,  self.video_height])
                     (centerX, centerY, width, height) = box.astype('int')
 
@@ -61,6 +58,5 @@ class Yolo:
 
         return boxes, confidences, classIds
 
-
-    def getNMSBoxes(self, boxes, confidences):
+    def get_NMS_boxes(self, boxes, confidences):
         return cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.3)

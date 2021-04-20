@@ -5,8 +5,6 @@ import numpy as np
 class BirdsEye:
 
     def __init__(self, source_points, dest_points, cam_matrix, distortion_coef):
-        self.spoints = source_points
-        self.dpoints = dest_points
         self.src_points = np.array(source_points, np.float32)
         self.dest_points = np.array(dest_points, np.float32)
         self.cam_matrix = cam_matrix

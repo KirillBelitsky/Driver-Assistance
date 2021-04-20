@@ -10,10 +10,10 @@ class VideoHelper:
         self.video_width = None
         self.video_height = None
 
-        self.init_video_stream(input_video_path)
+        self.initialize_video_stream(input_video_path)
         self.initialize_video_writer(output_video_path)
 
-    def init_video_stream(self, input_video_path):
+    def initialize_video_stream(self, input_video_path):
         self.video_stream = cv2.VideoCapture(input_video_path)
 
         self.video_width = int(self.video_stream.get(cv2.CAP_PROP_FRAME_WIDTH))

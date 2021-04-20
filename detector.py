@@ -6,18 +6,24 @@ import numpy as np
 
 from events.dispatchers.refreshUiEventDispatcher import RefreshUiEventDispatcher
 from services.videoHelper import VideoHelper
-from util.util import get_random_RGB_colors, read_classes
+from util.util import Util
 from carDetection.yolo import Yolo
 from laneRecognition.laneRecognator import LaneRecognator
 
 
 class Detector:
 
+    def __init__(self):
+        self.yolo = None
+        self.video_helper = None
+        self.lane_recognator = LaneRecognator()
+        self.refresh_ui_dispatcher = RefreshUiEventDispatcher()
+
     def draw_boxes(self, idxs, boxes, classIds, classes, confidences, frame):
         if len(idxs) == 0:
             return
 
-        colors = get_random_RGB_colors()
+        colors = Util.get_random_RGB_colors()
         for i in idxs.flatten():
             (x, y) = (boxes[i][0], boxes[i][1])
             (width, height) = (boxes[i][2], boxes[i][3])
@@ -38,34 +44,31 @@ class Detector:
                classesPath='../config/coco-classes.txt',
                gpu=False):
 
-        video_helper = VideoHelper(inputPath, outputPath)
+        self.video_helper = VideoHelper(inputPath, outputPath)
 
-        if not video_helper.is_video_stream_opened():
+        if not self.video_helper.is_video_stream_opened():
             print('Camera or video is not opened!')
             return
 
-        classes = read_classes(classesPath)
+        classes = Util.read_classes(classesPath)
 
-        video_size = video_helper.get_video_size()
-        yolo = Yolo(configPath, weightsPath, video_size[1], video_size[0], gpu)
-
-        lane_recognator = LaneRecognator()
-        refresh_ui_dispatcher = RefreshUiEventDispatcher()
+        video_size = self.video_helper.get_video_size()
+        self.yolo = Yolo(configPath, weightsPath, video_size[1], video_size[0], gpu)
 
         frames_count = 0
         prev_frame_time = 0
 
         while True:
 
-            (grabbed, frame) = video_helper.read_frame()
+            (grabbed, frame) = self.video_helper.read_frame()
             if not grabbed or getattr(threading.currentThread(), 'stop_process', False):
                 break
 
-            boxes, confidences, classIds = yolo.detect(frame)
-            idxs = yolo.getNMSBoxes(boxes, confidences)
+            boxes, confidences, classIds = self.yolo.detect(frame)
+            idxs = self.yolo.get_NMS_boxes(boxes, confidences)
 
             frameForLane = np.copy(frame)
-            lane_recognized_image, result = lane_recognator.pipeline(frameForLane)
+            lane_recognized_image, result = self.lane_recognator.debug_pipeline(frameForLane)
 
             self.draw_boxes(idxs, boxes, classIds, classes, confidences, lane_recognized_image)
 
@@ -75,15 +78,15 @@ class Detector:
             frames_count += 1
             print('FRAME: %s, FPS: %s' % (str(frames_count), str(np.round(fps, 2))))
 
-            refresh_ui_dispatcher.dispatch(result)
+            self.refresh_ui_dispatcher.dispatch(result)
 
             # cv2.imshow('Frame', lane_recognized_image)
-            video_helper.write_frame(lane_recognized_image)
+            self.video_helper.write_frame(lane_recognized_image)
 
             # if cv2.waitKey(1) & 0xFF == ord('q'):
             #     break
 
         print('Finished')
 
-        video_helper.destroy_streams()
+        self.video_helper.destroy_streams()
         cv2.destroyAllWindows()

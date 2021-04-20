@@ -6,11 +6,13 @@ from events.listeners.closeEventListener import CloseEventListener
 from events.listeners.refreshUiEventListener import RefreshUiEventListener
 from util.uiutil import UiUtil
 
+
 class DetectAdapter(CloseEventListener, RefreshUiEventListener):
 
     def __init__(self):
         self.detector = Detector()
         self.callback = None
+        self.x = None
 
     def set_callback(self, callback):
         self.callback = callback
@@ -25,9 +27,9 @@ class DetectAdapter(CloseEventListener, RefreshUiEventListener):
             self.x.stop_process = True
         else:
             if self.callback:
-                self.callback(self.transform_data(data))
+                self.callback(self.__transform_data(data))
 
-    def transform_data(self, data):
+    def __transform_data(self, data):
         image = data['result_image']
         pixmap = UiUtil.arrimage2QPixmap(image)
 

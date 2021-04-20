@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from util.util import scale_abs
+from util.util import Util
 
 
 class LaneFilter:
@@ -61,7 +61,7 @@ class LaneFilter:
 
         gradl = np.arctan2(np.absolute(ly), np.absolute(lx))
         l_mag = np.sqrt(lx ** 2 + ly ** 2)
-        slm, slx, sly = scale_abs(l_mag), scale_abs(lx), scale_abs(ly)
+        slm, slx, sly = Util.scale_abs(l_mag), Util.scale_abs(lx), Util.scale_abs(ly)
         b = self.z.copy()
 
         self.sobel_cond1 = slm > self.mag_thresh

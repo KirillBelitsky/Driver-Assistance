@@ -4,46 +4,34 @@ from PyQt5 import QtCore, QtWidgets
 class Ui_StartWindow(object):
 
     def __init__(self):
-        self.videoPath = None
-        self.outputVideoPath = None
+        pass
 
-    def setupUi(self, mainWindow):
-        mainWindow.setObjectName("mainWindow")
-        mainWindow.setFixedSize(300, 170)
+    def setupUi(self, startWindow):
+        startWindow.setObjectName("mainWindow")
+        startWindow.setFixedSize(300, 170)
 
-        self.centralwidget = QtWidgets.QWidget(mainWindow)
+        self.centralwidget = QtWidgets.QWidget(startWindow)
         self.centralwidget.setObjectName("centralwidget")
 
-        self.initBars(mainWindow)
-        self.initLabels()
-        self.initButtons()
+        self.__initLabels()
+        self.__initButtons()
 
-        mainWindow.setCentralWidget(self.centralwidget)
+        startWindow.setCentralWidget(self.centralwidget)
 
-        self.retranslateUi(mainWindow)
-        QtCore.QMetaObject.connectSlotsByName(mainWindow)
+        self.retranslateUi(startWindow)
+        QtCore.QMetaObject.connectSlotsByName(startWindow)
 
-    def retranslateUi(self, mainWindow):
+    def retranslateUi(self, startWindow):
         _translate = QtCore.QCoreApplication.translate
-        mainWindow.setWindowTitle(_translate("mainWindow", "mainWindow"))
+        startWindow.setWindowTitle(_translate("mainWindow", "mainWindow"))
 
-        self.label.setText(_translate("mainWindow", "Choose video:"))
+        self.chooseVideoLabel.setText(_translate("mainWindow", "Choose video:"))
         self.chooseVideoButton.setText(_translate("mainWindow", "..."))
         self.startButton.setText(_translate("mainWindow", "Start"))
         self.chooseOutputPathButton.setText(_translate("mainWindow", "..."))
-        self.label_2.setText(_translate("mainWindow", "Choose output path:"))
+        self.chooseOutputPathLabel.setText(_translate("mainWindow", "Choose output path:"))
 
-    def initBars(self, mainWindow):
-        self.menubar = QtWidgets.QMenuBar(mainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 350, 22))
-        self.menubar.setObjectName("menubar")
-        mainWindow.setMenuBar(self.menubar)
-
-        self.statusbar = QtWidgets.QStatusBar(mainWindow)
-        self.statusbar.setObjectName("statusbar")
-        mainWindow.setStatusBar(self.statusbar)
-
-    def initButtons(self):
+    def __initButtons(self):
         self.chooseVideoButton = QtWidgets.QPushButton(self.centralwidget)
         self.chooseVideoButton.setGeometry(QtCore.QRect(190, 20, 90, 25))
         self.chooseVideoButton.setObjectName("chooseVideoButton")
@@ -56,11 +44,11 @@ class Ui_StartWindow(object):
         self.chooseOutputPathButton.setGeometry(QtCore.QRect(190, 60, 90, 25))
         self.chooseOutputPathButton.setObjectName("chooseOutputPathButton")
 
-    def initLabels(self):
-        self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(20, 20, 100, 25))
-        self.label.setObjectName("label")
+    def __initLabels(self):
+        self.chooseVideoLabel = QtWidgets.QLabel(self.centralwidget)
+        self.chooseVideoLabel.setGeometry(QtCore.QRect(20, 20, 100, 25))
+        self.chooseVideoLabel.setObjectName("chooseVideoLabel")
 
-        self.label_2 = QtWidgets.QLabel(self.centralwidget)
-        self.label_2.setGeometry(QtCore.QRect(20, 60, 141, 25))
-        self.label_2.setObjectName("label_2")
+        self.chooseOutputPathLabel = QtWidgets.QLabel(self.centralwidget)
+        self.chooseOutputPathLabel.setGeometry(QtCore.QRect(20, 60, 141, 25))
+        self.chooseOutputPathLabel.setObjectName("chooseOutputPathLabel")

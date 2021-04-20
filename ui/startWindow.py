@@ -14,32 +14,35 @@ class StartWindow(QMainWindow):
         self.ui = Ui_StartWindow()
         self.ui.setupUi(self)
 
-        self.init_button_listeners()
+        self.video_path = None
+        self.output_video_path = None
 
-    def init_button_listeners(self):
-        self.ui.chooseVideoButton.clicked.connect(self.on_click_chooseVideoButton)
-        self.ui.chooseOutputPathButton.clicked.connect(self.on_click_chooseOutputPathButton)
-        self.ui.startButton.clicked.connect(self.on_click_startButton)
+        self.__init_button_listeners()
 
-    def on_click_chooseVideoButton(self):
+    def __init_button_listeners(self):
+        self.ui.chooseVideoButton.clicked.connect(self.__on_click_chooseVideoButton)
+        self.ui.chooseOutputPathButton.clicked.connect(self.__on_click_chooseOutputPathButton)
+        self.ui.startButton.clicked.connect(self.__on_click_startButton)
+
+    def __on_click_chooseVideoButton(self):
         filename, _ = QFileDialog.getOpenFileName(self, 'Choose video',
                                                   '/home/kirill/PythonProjects/Driver-Assistance/videos/',
                                                   'Videos (*.mp4 *.avi)')
         if filename:
-            self.ui.videoPath = filename
+            self.video_path = filename
 
-    def on_click_chooseOutputPathButton(self):
-        if self.ui.videoPath is None:
-            self.show_error_message('Firstly, choose video!')
+    def __on_click_chooseOutputPathButton(self):
+        if self.video_path is None:
+            UiUtil.show_message('Firstly, choose video!', 'Error', QMessageBox.Critical)
             return
 
         directory = QFileDialog.getExistingDirectory(self, caption='Choose Directory',
                                                      directory='/home/kirill/PythonProjects/Driver-Assistance/videos/output_videos/')
         if directory:
-            self.ui.outputVideoPath = UiUtil.generate_output_video_path(directory, self.ui.videoPath)
+            self.output_video_path = UiUtil.generate_output_video_path(directory, self.video_path)
 
-    def on_click_startButton(self):
-        validated, message = self.validate()
+    def __on_click_startButton(self):
+        validated, message = self.__validate()
         if not validated:
             UiUtil.show_message(message, 'Error', QMessageBox.Critical)
             return
@@ -49,9 +52,9 @@ class StartWindow(QMainWindow):
         self.hide()
         self.detectVideoWindow.run_detection()
 
-    def validate(self):
-        video_path_not_valid = self.ui.videoPath is None
-        output_video_path_not_valid = self.ui.outputVideoPath is None
+    def __validate(self):
+        video_path_not_valid = self.video_path is None
+        output_video_path_not_valid = self.output_video_path is None
 
         if video_path_not_valid and output_video_path_not_valid:
             return False, 'Please, choose required parameters!'
