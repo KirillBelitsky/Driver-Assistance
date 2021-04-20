@@ -4,7 +4,8 @@ import time
 import cv2
 import numpy as np
 
-from events.dispatchers.refreshUiEventDispatcher import RefreshUiEventDispatcher
+from events.dispatchers.EventDispatcher import EventDispatcher
+from events.events.Event import Event
 from services.videoHelper import VideoHelper
 from util.util import Util
 from carDetection.yolo import Yolo
@@ -17,7 +18,7 @@ class Detector:
         self.yolo = None
         self.video_helper = None
         self.lane_recognator = LaneRecognator()
-        self.refresh_ui_dispatcher = RefreshUiEventDispatcher()
+        self.refresh_ui_dispatcher = EventDispatcher()
 
     def draw_boxes(self, idxs, boxes, classIds, classes, confidences, frame):
         if len(idxs) == 0:
@@ -37,6 +38,9 @@ class Detector:
         cur_time = time.time()
         fps = 1 / (cur_time - prev_time)
         return fps, cur_time
+
+    def dispatch_refresh_event(self, result):
+        self.refresh_ui_dispatcher.dispatch(Event.REFRESHUI, result)
 
     def detect(self, inputPath, outputPath,
                configPath='../config/yolov4-tiny.cfg',
@@ -78,7 +82,7 @@ class Detector:
             frames_count += 1
             print('FRAME: %s, FPS: %s' % (str(frames_count), str(np.round(fps, 2))))
 
-            self.refresh_ui_dispatcher.dispatch(result)
+            self.dispatch_refresh_event(result)
 
             # cv2.imshow('Frame', lane_recognized_image)
             self.video_helper.write_frame(lane_recognized_image)

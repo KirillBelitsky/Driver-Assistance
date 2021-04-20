@@ -1,8 +1,8 @@
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 
-from events.dispatchers.closeEventDispatcher import CloseEventDispatcher
-from events.dispatchers.refreshUiEventDispatcher import RefreshUiEventDispatcher
+from events.dispatchers.EventDispatcher import EventDispatcher
+from events.events.Event import Event
 from services.detectAdapter import DetectAdapter
 from ui.uiDetectVideoWindow import Ui_DetectVideoWindow
 from util.uiutil import UiUtil
@@ -15,21 +15,20 @@ class DetectVideoWindow(QMainWindow):
         self.ui = Ui_DetectVideoWindow()
         self.ui.setupUi(self)
 
-        self.detectAdapter = DetectAdapter()
-        self.detectAdapter.set_callback(self.__refresh_data)
+        self.detect_adapter = DetectAdapter()
+        self.detect_adapter.set_callback(self.__refresh_data)
 
-        self.closeEventDispatcher = CloseEventDispatcher()
-        self.refreshUiEventDispatcher = RefreshUiEventDispatcher()
+        self.event_dispatcher = EventDispatcher()
 
-        self.closeEventDispatcher.register(self.detectAdapter)
-        self.refreshUiEventDispatcher.register(self.detectAdapter)
+        self.event_dispatcher.register(Event.REFRESHUI, self.detect_adapter)
+        self.event_dispatcher.register(Event.CLOSE, self.detect_adapter)
 
         self.parent = parentWindow
         self.__init_button_listeners()
 
     def __del__(self):
-        self.closeEventDispatcher.unregister(self.detectAdapter)
-        self.refreshUiEventDispatcher.unregister(self.detectAdapter)
+        self.event_dispatcher.unregister(Event.REFRESHUI, self.detect_adapter)
+        self.event_dispatcher.unregister(Event.CLOSE, self.detect_adapter)
 
     def __init_button_listeners(self):
         self.ui.stopButton.clicked.connect(self.__on_click_stopButton)
@@ -41,7 +40,7 @@ class DetectVideoWindow(QMainWindow):
         self.close()
 
     def run_detection(self):
-        self.detectAdapter.detect(self.parent.video_path, self.parent.output_video_path)
+        self.detect_adapter.detect(self.parent.video_path, self.parent.output_video_path)
 
     def __refresh_data(self, data):
         self.ui.image.setPixmap(data['pixmap'])
@@ -50,7 +49,7 @@ class DetectVideoWindow(QMainWindow):
         self.ui.directionValue.setText(data['direction'])
 
     def closeEvent(self, event):
-        self.closeEventDispatcher.dispatch(None)
+        self.event_dispatcher.dispatch(Event.CLOSE, None)
         self.__close_window(event)
 
     def __close_window(self, event):
