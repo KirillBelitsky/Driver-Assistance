@@ -35,9 +35,8 @@ class LaneFilter:
         return np.dstack((b1, b2, self.z))
 
     def apply(self, rgb_image):
-        self.hls = cv2.cvtColor(rgb_image, cv2.COLOR_RGB2HLS)
-        self.l = self.hls[:, :, 1]
-        self.s = self.hls[:, :, 2]
+        self.hls = Util.RGB2HSL(rgb_image)
+        self.l, self.s = Util.get_l_s_channels_from_HSL(rgb_image)
         self.z = np.zeros_like(self.s)
 
         color_img = self.apply_color_mask()

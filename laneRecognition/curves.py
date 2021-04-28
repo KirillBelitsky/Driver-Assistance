@@ -3,7 +3,8 @@ import numpy as np
 
 
 class Curves:
-    def __init__(self, number_of_windows, margin, minimum_pixels, ym_per_pix, xm_per_pix):
+    def __init__(self, number_of_windows=9, margin=100, minimum_pixels=50,
+                 ym_per_pix=30/720, xm_per_pix=3.7/700):
 
         self.min_pix = minimum_pixels
         self.margin = margin

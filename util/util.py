@@ -1,8 +1,17 @@
 import numpy as np
+import cv2
 import pickle
 
 
 class Util:
+
+    @staticmethod
+    def RGB2HSL(image):
+        return cv2.cvtColor(image, cv2.COLOR_RGB2HLS)
+
+    @staticmethod
+    def get_l_s_channels_from_HSL(image):
+        return image[:, :, 1], image[:, :, 2]
 
     @staticmethod
     def get_random_RGB_colors(colorsAmount=100):

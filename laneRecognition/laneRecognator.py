@@ -20,18 +20,18 @@ class LaneRecognator:
     def __init__(self):
         matrix, distortion_coef = Util.get_calibration_properties('../config/calibration_data.p')
 
-        self.birdsEye = BirdsEye(source_points, destination_points,
+        self.birds_eye = BirdsEye(source_points, destination_points,
                                  matrix, distortion_coef)
-        self.laneFilter = LaneFilter(p)
+        self.lane_filter = LaneFilter(p)
         self.curves = Curves(number_of_windows=9, margin=100, minimum_pixels=50,
                              ym_per_pix=30 / 720, xm_per_pix=3.7 / 700)
 
     def pipeline(self, img):
-        ground_img = self.birdsEye.undistort(img)
-        binary = self.laneFilter.apply(ground_img)
-        wb = np.logical_and(self.birdsEye.sky_view(binary), Util.roi(binary)).astype(np.uint8)
+        ground_img = self.birds_eye.undistort(img)
+        binary = self.lane_filter.apply(ground_img)
+        wb = np.logical_and(self.birds_eye.sky_view(binary), Util.roi(binary)).astype(np.uint8)
         result = self.curves.fit(wb)
-        ground_img_with_projection = self.birdsEye.project(ground_img, binary,
+        ground_img_with_projection = self.birds_eye.project(ground_img, binary,
                                                            result['pixel_left_best_fit_curve'],
                                                            result['pixel_right_best_fit_curve'])
 
@@ -64,14 +64,14 @@ class LaneRecognator:
         return pro_img, result
 
     def debug_pipeline_process(self, img):
-        ground_img = self.birdsEye.undistort(img)
-        birdseye_img = self.birdsEye.sky_view(img)
+        ground_img = self.birds_eye.undistort(img)
+        birdseye_img = self.birds_eye.sky_view(img)
 
-        binary_img = self.laneFilter.apply(ground_img)
-        sobel_img = self.birdsEye.sky_view(self.laneFilter.sobel_breakdown(ground_img))
-        color_img = self.birdsEye.sky_view(self.laneFilter.color_breakdown(ground_img))
+        binary_img = self.lane_filter.apply(ground_img)
+        sobel_img = self.birds_eye.sky_view(self.lane_filter.sobel_breakdown(ground_img))
+        color_img = self.birds_eye.sky_view(self.lane_filter.color_breakdown(ground_img))
 
-        wb = np.logical_and(self.birdsEye.sky_view(binary_img), Util.roi(binary_img)).astype(np.uint8)
+        wb = np.logical_and(self.birds_eye.sky_view(binary_img), Util.roi(binary_img)).astype(np.uint8)
         result = self.curves.fit(wb)
 
         left_curve = result['pixel_left_best_fit_curve']
@@ -79,7 +79,7 @@ class LaneRecognator:
 
         curve_debug_img = result['image']
 
-        projected_img = self.birdsEye.project(ground_img, binary_img, left_curve, right_curve)
+        projected_img = self.birds_eye.project(ground_img, binary_img, left_curve, right_curve)
 
         return birdseye_img, sobel_img, color_img, curve_debug_img, projected_img, result
 
