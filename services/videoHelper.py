@@ -20,10 +20,10 @@ class VideoHelper:
         self.video_height = int(self.video_stream.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     def initialize_video_writer(self, output_path):
-        sourceFPS = self.video_stream.get(cv2.CAP_PROP_FPS)
+        fps = self.video_stream.get(cv2.CAP_PROP_FPS)
         fourcc = cv2.VideoWriter_fourcc(*"MJPG")
 
-        self.video_writer = cv2.VideoWriter(output_path, fourcc, sourceFPS,
+        self.video_writer = cv2.VideoWriter(output_path, fourcc, fps,
                                             (self.video_width, self.video_height), True)
 
     def get_video_size(self):

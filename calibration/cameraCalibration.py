@@ -1,7 +1,7 @@
 import cv2
 import pickle
 
-from chessBoard import ChessBoard
+from chessboard import Chessboard
 
 
 # Initialize 20 chessboards
@@ -13,20 +13,19 @@ class CameraCalibration:
 
     def calibrate(self):
         for n in range(20):
-            this_path = '../images/calibrationImages/calibration' + str(n + 1) + '.jpg'
-            chessboard = ChessBoard(i=n, path=this_path, nx=9, ny=6)
+            path = '../images/calibrationImages/calibration' + str(n + 1) + '.jpg'
+            chessboard = Chessboard(path=path, x_number=9, y_number=6)
             self.chessboards.append(chessboard)
 
         points, corners, shape = self.get_data_needed_for_calibration()
 
-        r, matrix, distortion_coef, rv, tv = cv2.calibrateCamera(points, corners, shape, None, None)
+        _, matrix, dist_coef, _, _ = cv2.calibrateCamera(points, corners, shape, None, None)
 
-        # Let's store these camera calibration parameters
-        calibration_data = {
+        data = {
             "camera_matrix": matrix,
-            "distortion_coefficient": distortion_coef
+            "distortion_coefficient": dist_coef
         }
-        self.save_calibration_data(calibration_data)
+        self.save_calibration_data(data)
 
     # We use these corners and object points (and image dimension)
     # from all the chessboards to calculate the calibration parameters
