@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from scipy.misc import imresize  # scipy 1.2.2
+from PIL import Image
 
 from laneRecognition.birdsEye import BirdsEye
 from laneRecognition.laneFilter import LaneFilter
@@ -44,10 +44,17 @@ class LaneRecognator:
     def debug_pipeline(self, img):
         b_img, s_img, co_img, cu_img, pro_img, result = self.debug_pipeline_process(img)
 
-        b_img = imresize(b_img, 0.25)
-        s_img = imresize(s_img, 0.25)
-        co_img = imresize(co_img, 0.25)
-        cu_img = imresize(cu_img, 0.25)
+        h, w, _ = map(lambda x: int(x/4), img.shape)
+        resize = (w, h)
+
+        b_img = np.array(Image.fromarray(b_img).resize(resize))
+        s_img = np.array(Image.fromarray(s_img).resize(resize))
+        co_img = np.array(Image.fromarray(co_img).resize(resize))
+        cu_img = np.array(Image.fromarray(cu_img).resize(resize))
+        # b_img = imresize(b_img, 0.25)
+        # s_img = imresize(s_img, 0.25)
+        # co_img = imresize(co_img, 0.25)
+        # cu_img = imresize(cu_img, 0.25)
 
         offset = [0, 320, 640, 960]
         width, height = 320, 180

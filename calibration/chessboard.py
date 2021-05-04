@@ -17,7 +17,7 @@ class Chessboard:
         image = imread(self.path)
         self.gray_image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 
-        rows, cols, channels = self.gray_image.shape
+        rows, cols, _ = self.gray_image.shape
         self.dimensions = (rows, cols)
 
         self.obj_points = self.get_obj_points()
