@@ -1,8 +1,8 @@
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 
-from events.dispatchers.EventDispatcher import EventDispatcher
-from events.events.Event import Event
+from events.dispatchers.eventDispatcher import EventDispatcher
+from events.events.event import Event
 from services.detectAdapter import DetectAdapter
 from ui.uiDetectVideoWindow import Ui_DetectVideoWindow
 from util.uiutil import UiUtil

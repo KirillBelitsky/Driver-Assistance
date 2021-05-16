@@ -3,7 +3,7 @@ import threading
 import numpy as np
 
 from events.listeners.closeEventListener import CloseEventListener
-from events.listeners.refreshUiEventListener import RefreshUiEventListener
+from events.listeners.refreshEventListener import RefreshUiEventListener
 from util.uiutil import UiUtil
 
 

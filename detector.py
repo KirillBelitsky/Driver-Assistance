@@ -4,8 +4,8 @@ import time
 import cv2
 import numpy as np
 
-from events.dispatchers.EventDispatcher import EventDispatcher
-from events.events.Event import Event
+from events.dispatchers.eventDispatcher import EventDispatcher
+from events.events.event import Event
 from services.videoHelper import VideoHelper
 from util.util import Util
 from carDetection.yolo import Yolo

@@ -4,12 +4,12 @@ import os
 import shutil
 import numpy as np
 import tensorflow as tf
-from train.yolotrainmodel import YoloTrainModel
+from train.yoloTrainModel import YoloTrainModel
 from train.dataset import Dataset
 from train.trainConfig import cfg
 from util.util import Util
 
-flags.DEFINE_string('weights', '../config/yolov4.weights', 'pretrained weights')
+flags.DEFINE_string('weights', '../config/yolov3.weights', 'pretrained weights')
 flags.DEFINE_boolean('tiny', False, 'yolo or yolo-tiny')
 
 class TrainNeuralNetwork:
