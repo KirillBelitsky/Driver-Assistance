@@ -1,5 +1,4 @@
 import argparse
-import os
 from detector import Detector
 
 parser = argparse.ArgumentParser()
@@ -7,20 +6,21 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--input', required=True, help='path to input video')
 parser.add_argument('--output', required=True, help='path to output video')
 parser.add_argument('--config', required=True, help='path to yolo config files')
+parser.add_argument('--classes', required=True, help='path to classes')
+parser.add_argument('--weights', required=True, help='path to weights')
 parser.add_argument('--gpu', required=False, help='GPU Cuda must be used (0 - no, 1 - yes')
 
 args = vars(parser.parse_args())
 
-inputPath = args['input']
-outputPath = args['output']
+input_path = args['input']
+output_path = args['output']
+classes_path = args['classes']
+weights_path = args['weights']
+config_path = args['config']
 gpu = args['gpu']
 gpu = True if gpu is not None and gpu == '1' else False
 
-weightsPath = os.path.sep.join([args["config"], 'yolov4-tiny.weights'])
-configPath = os.path.sep.join([args["config"], 'yolov4-tiny.cfg'])
-classesPath = os.path.sep.join([args["config"], 'coco-classes.txt'])
-
 detector = Detector()
-detector.detect(inputPath, outputPath, configPath, weightsPath, classesPath, gpu)
+detector.detect(input_path, output_path, config_path, weights_path, classes_path, gpu)
 
 
