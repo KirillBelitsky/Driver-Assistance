@@ -5,9 +5,9 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('--input', required=True, help='path to input video')
 parser.add_argument('--output', required=True, help='path to output video')
-parser.add_argument('--config', required=True, help='path to yolo config files')
-parser.add_argument('--classes', required=True, help='path to classes')
-parser.add_argument('--weights', required=True, help='path to weights')
+parser.add_argument('--config', required=False, help='path to yolo config files')
+parser.add_argument('--classes', required=False, help='path to classes')
+parser.add_argument('--weights', required=False, help='path to weights')
 parser.add_argument('--gpu', required=False, help='GPU Cuda must be used (0 - no, 1 - yes')
 
 args = vars(parser.parse_args())

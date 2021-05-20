@@ -8,7 +8,7 @@ class Ui_StartWindow(object):
 
     def setupUi(self, startWindow):
         startWindow.setObjectName("mainWindow")
-        startWindow.setFixedSize(300, 170)
+        startWindow.setFixedSize(325, 170)
 
         self.centralwidget = QtWidgets.QWidget(startWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -23,32 +23,32 @@ class Ui_StartWindow(object):
 
     def retranslateUi(self, startWindow):
         _translate = QtCore.QCoreApplication.translate
-        startWindow.setWindowTitle(_translate("mainWindow", "mainWindow"))
+        startWindow.setWindowTitle(_translate("mainWindow", "Стартовое окно"))
 
-        self.chooseVideoLabel.setText(_translate("mainWindow", "Choose video:"))
+        self.chooseVideoLabel.setText(_translate("mainWindow", "Выбрать видеофайл:"))
         self.chooseVideoButton.setText(_translate("mainWindow", "..."))
-        self.startButton.setText(_translate("mainWindow", "Start"))
+        self.startButton.setText(_translate("mainWindow", "Запустить"))
         self.chooseOutputPathButton.setText(_translate("mainWindow", "..."))
-        self.chooseOutputPathLabel.setText(_translate("mainWindow", "Choose output path:"))
+        self.chooseOutputPathLabel.setText(_translate("mainWindow", "Выбрать директорию:"))
 
     def __initButtons(self):
         self.chooseVideoButton = QtWidgets.QPushButton(self.centralwidget)
-        self.chooseVideoButton.setGeometry(QtCore.QRect(190, 20, 90, 25))
+        self.chooseVideoButton.setGeometry(QtCore.QRect(210, 20, 90, 25))
         self.chooseVideoButton.setObjectName("chooseVideoButton")
 
         self.startButton = QtWidgets.QPushButton(self.centralwidget)
-        self.startButton.setGeometry(QtCore.QRect(105, 120, 89, 25))
+        self.startButton.setGeometry(QtCore.QRect(115, 120, 90, 25))
         self.startButton.setObjectName("startButton")
 
         self.chooseOutputPathButton = QtWidgets.QPushButton(self.centralwidget)
-        self.chooseOutputPathButton.setGeometry(QtCore.QRect(190, 60, 90, 25))
+        self.chooseOutputPathButton.setGeometry(QtCore.QRect(210, 60, 90, 25))
         self.chooseOutputPathButton.setObjectName("chooseOutputPathButton")
 
     def __initLabels(self):
         self.chooseVideoLabel = QtWidgets.QLabel(self.centralwidget)
-        self.chooseVideoLabel.setGeometry(QtCore.QRect(20, 20, 100, 25))
+        self.chooseVideoLabel.setGeometry(QtCore.QRect(20, 20, 160, 25))
         self.chooseVideoLabel.setObjectName("chooseVideoLabel")
 
         self.chooseOutputPathLabel = QtWidgets.QLabel(self.centralwidget)
-        self.chooseOutputPathLabel.setGeometry(QtCore.QRect(20, 60, 141, 25))
+        self.chooseOutputPathLabel.setGeometry(QtCore.QRect(20, 60, 160, 25))
         self.chooseOutputPathLabel.setObjectName("chooseOutputPathLabel")

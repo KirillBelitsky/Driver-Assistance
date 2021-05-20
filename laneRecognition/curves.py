@@ -76,11 +76,11 @@ class Curves:
         rx = rx[::-1]  # Reverse to match top-to-bottom in y
 
         if lx[0] - lx[-1] > 60:
-            self.direction = 'Left'
+            self.direction = 'Налево'
         elif lx[-1] - lx[0] > 60:
-            self.direction = 'Right'
+            self.direction = 'Направо'
         else:
-            self.direction = 'Straight'
+            self.direction = 'Прямо'
 
     def __plot(self, t=4):
 
@@ -125,11 +125,11 @@ class Curves:
         self.vehicle_position = (pix_pos - mid) * self.kx
 
         if self.vehicle_position < 0:
-            self.vehicle_position_words = str(np.absolute(np.round(self.vehicle_position, 2))) + " m left of center"
+            self.vehicle_position_words = str(np.absolute(np.round(self.vehicle_position, 2))) + " м слева"
         elif self.vehicle_position > 0:
-            self.vehicle_position_words = str(np.absolute(np.round(self.vehicle_position, 2))) + " m right of center"
+            self.vehicle_position_words = str(np.absolute(np.round(self.vehicle_position, 2))) + " м справа"
         else:
-            self.vehicle_position_words = "at the center"
+            self.vehicle_position_words = "в центре"
 
     def fit(self, binary):
 
