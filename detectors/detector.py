@@ -43,9 +43,9 @@ class Detector:
         self.refresh_ui_dispatcher.dispatch(Event.REFRESHUI, result)
 
     def detect(self, input_path, output_path,
-               config_path='../config/yolov3.cfg',
-               weights_path='../config/yolov3.weights',
-               classes_path='../config/coco-classes.txt',
+               config_path='config/yolov3.cfg',
+               weights_path='config/yolov3.weights',
+               classes_path='config/coco-classes.txt',
                gpu=False):
 
         self.video_helper = VideoHelper(input_path, output_path)

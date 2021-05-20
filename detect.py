@@ -1,5 +1,5 @@
 import argparse
-from detector import Detector
+from detectors.detector import Detector
 
 parser = argparse.ArgumentParser()
 

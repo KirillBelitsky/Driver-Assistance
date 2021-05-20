@@ -1,4 +1,4 @@
-from detect.detector import Detector
+from detectors.detector import Detector
 import threading
 import numpy as np
 
