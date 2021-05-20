@@ -14,11 +14,10 @@ args = vars(parser.parse_args())
 
 input_path = args['input']
 output_path = args['output']
-classes_path = args['classes']
-weights_path = args['weights']
-config_path = args['config']
-gpu = args['gpu']
-gpu = True if gpu is not None and gpu == '1' else False
+weights_path = args['weights'] if args['weights'] is not None else 'config/yolov4-tiny.weights'
+config_path = args['config'] if args['config'] is not None else 'config/yolov4-tiny.cfg'
+classes_path = args['classes'] if args['classes'] is not None else 'config/coco-classes.txt'
+gpu = True if args['gpu'] is not None and args['gpu'] == '1' else False
 
 detector = Detector()
 detector.detect(input_path, output_path, config_path, weights_path, classes_path, gpu)

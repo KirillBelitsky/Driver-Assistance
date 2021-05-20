@@ -8,6 +8,7 @@ from train.yoloTrainModel import YoloTrainModel
 from train.dataset import Dataset
 from train.trainConfig import cfg
 from util.util import Util
+from tensorflow.python.framework.convert_to_constants import convert_variables_to_constants_v2
 
 class TrainNeuralNetwork:
 
@@ -113,9 +114,22 @@ class TrainNeuralNetwork:
                         Util.unfreeze_all(freeze)
             for image_data, target in self.trainset:
                 self.train_step(image_data, target)
-            for image_data, target in self.testset:
-                self.test_step(image_data, target)
-            self.model.save_weights("../config/yolov4_train")
+            # for image_data, target in self.testset:
+            #     self.test_step(image_data, target)
+
+        self.model.save("../config/trained.h5")
+        print('.h5 saved')
+
+        full_model = tf.function(lambda x: self.model(x))
+        full_model = full_model.get_concrete_function(
+            tf.TensorSpec(self.model.inputs[0].shape, self.model.inputs[0].dtype))
+        frozen_func = convert_variables_to_constants_v2(full_model)
+        frozen_func.graph.as_graph_def()
+
+        tf.io.write_graph(frozen_func.graph, '../config', 'trained.pb',
+                             as_text=False)
+        tf.io.write_graph(frozen_func.graph, '../config', 'trained.pbtxt',
+                          as_text=True)
 
     # define training step function
     # @tf.function

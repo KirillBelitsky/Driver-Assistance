@@ -25,5 +25,6 @@ class EventDispatcher(metaclass=SingletonMeta):
             instances.remove(instance)
 
     def dispatch(self, event, data):
-        for instance in self.event_objects_map.get(event):
-            instance.call(data)
+        if self.event_objects_map.get(event) is not None:
+            for instance in self.event_objects_map.get(event):
+                instance.call(data)

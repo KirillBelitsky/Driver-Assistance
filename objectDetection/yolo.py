@@ -19,7 +19,10 @@ class Yolo:
     def initialize_net(self):
         print('Loading YOLO')
 
-        self.net = cv2.dnn.readNetFromDarknet(self.config_path, self.weights_path)
+        if self.weights_path.split('.')[-1] == 'weights':
+            self.net = cv2.dnn.readNetFromDarknet(self.config_path, self.weights_path)
+        else:
+            self.net = cv2.dnn.readNetFromTensorflow('config/trained.pb')
 
         if self.use_GPU:
             self.net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
