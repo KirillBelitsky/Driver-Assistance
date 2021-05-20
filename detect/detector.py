@@ -72,7 +72,7 @@ class Detector:
             idxs = self.yolo.get_NMS_boxes(boxes, confidences)
 
             frame_for_lane = np.copy(frame)
-            lane_recognized_image, result = self.lane_recognator.debug_pipeline(frame_for_lane)
+            lane_recognized_image, result = self.lane_recognator.pipeline(frame_for_lane)
 
             self.draw_boxes(idxs, boxes, classIds, classes, confidences, lane_recognized_image)
 

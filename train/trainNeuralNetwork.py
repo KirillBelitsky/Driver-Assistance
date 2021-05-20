@@ -1,5 +1,5 @@
-from absl import app, flags, logging
-from absl.flags import FLAGS
+from types import SimpleNamespace
+import argparse
 import os
 import shutil
 import numpy as np
@@ -8,9 +8,6 @@ from train.yoloTrainModel import YoloTrainModel
 from train.dataset import Dataset
 from train.trainConfig import cfg
 from util.util import Util
-
-flags.DEFINE_string('weights', '../config/yolov3.weights', 'pretrained weights')
-flags.DEFINE_boolean('tiny', False, 'yolo or yolo-tiny')
 
 class TrainNeuralNetwork:
 
@@ -37,8 +34,8 @@ class TrainNeuralNetwork:
         if len(physical_devices) > 0:
             tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
-        self.trainset = Dataset(FLAGS, is_training=True)
-        self.testset = Dataset(FLAGS, is_training=False)
+        self.trainset = Dataset(_argv, is_training=True)
+        self.testset = Dataset(_argv, is_training=False)
 
         logdir = "../logs/log"
         isfreeze = False
@@ -55,14 +52,14 @@ class TrainNeuralNetwork:
         input_layer = tf.keras.layers.Input([cfg.TRAIN.INPUT_SIZE, cfg.TRAIN.INPUT_SIZE, 3])
 
         # STRIDES, ANCHORS, NUM_CLASS, XYSCALE, IOU_LOSS_THRESH
-        _, _, NUM_CLASS, _ = Util.load_config(FLAGS)
+        _, _, NUM_CLASS, _ = Util.load_config(_argv)
 
-        self.freeze_layers = Util.load_freeze_layer(FLAGS.tiny)
+        self.freeze_layers = Util.load_freeze_layer(_argv.tiny)
 
-        self.yolo_model = YoloTrainModel(input_layer, NUM_CLASS, FLAGS)
-        conv_layers = self.yolo_model.create_tiny_model() if FLAGS.tiny else self.yolo_model.create_full_model()
+        self.yolo_model = YoloTrainModel(input_layer, NUM_CLASS, _argv)
+        conv_layers = self.yolo_model.create_tiny_model() if _argv.tiny else self.yolo_model.create_full_model()
 
-        if FLAGS.tiny:
+        if _argv.tiny:
             bbox_tensors = []
             for i, fm in enumerate(conv_layers):
                 if i == 0:
@@ -86,14 +83,14 @@ class TrainNeuralNetwork:
         self.model = tf.keras.Model(input_layer, bbox_tensors)
         self.model.summary()
 
-        if FLAGS.weights == None:
+        if _argv.weights == None:
             print("Training from scratch")
         else:
-            if FLAGS.weights.split(".")[len(FLAGS.weights.split(".")) - 1] == "weights":
-                Util.load_weights(self.model, FLAGS.weights, FLAGS.tiny)
+            if _argv.weights.split(".")[len(_argv.weights.split(".")) - 1] == "weights":
+                Util.load_weights(self.model, _argv.weights, _argv.tiny)
             else:
-                self.model.load_weights(FLAGS.weights)
-            print('Restoring weights from: %s ... ' % FLAGS.weights)
+                self.model.load_weights(_argv.weights)
+            print('Restoring weights from: %s ... ' % _argv.weights)
 
 
         self.optimizer = tf.keras.optimizers.Adam()
@@ -184,8 +181,20 @@ class TrainNeuralNetwork:
 
 
 if __name__ == '__main__':
-    try:
-        train = TrainNeuralNetwork()
-        app.run(train.train)
-    except SystemExit:
-        pass
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--weights', required=False, help='path to pretrained weights')
+    parser.add_argument('--tiny', required=False, help='is tiny model')
+
+    args = vars(parser.parse_args())
+
+    weights = args['weights'] if args['weights'] is not None else '../config/yolov3.weights'
+    tiny = args['tiny'] if args['tiny'] is not None else False
+
+    FLAGS = SimpleNamespace(weights=weights, tiny=tiny)
+
+    train = TrainNeuralNetwork()
+    train.train(FLAGS)
+
+    print('The learning is ended successfully!')
+
