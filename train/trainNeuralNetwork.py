@@ -1,5 +1,3 @@
-from types import SimpleNamespace
-import argparse
 import os
 import shutil
 import numpy as np
@@ -38,7 +36,7 @@ class TrainNeuralNetwork:
         self.trainset = Dataset(_argv, is_training=True)
         self.testset = Dataset(_argv, is_training=False)
 
-        logdir = "../logs/log"
+        logdir = "logs/log"
         isfreeze = False
 
         steps_per_epoch = len(self.trainset)
@@ -117,7 +115,7 @@ class TrainNeuralNetwork:
             # for image_data, target in self.testset:
             #     self.test_step(image_data, target)
 
-        self.model.save("../config/trained.h5")
+        self.model.save("config/trained.h5")
         print('.h5 saved')
 
         full_model = tf.function(lambda x: self.model(x))
@@ -126,9 +124,9 @@ class TrainNeuralNetwork:
         frozen_func = convert_variables_to_constants_v2(full_model)
         frozen_func.graph.as_graph_def()
 
-        tf.io.write_graph(frozen_func.graph, '../config', 'trained.pb',
+        tf.io.write_graph(frozen_func.graph, 'config', 'trained.pb',
                              as_text=False)
-        tf.io.write_graph(frozen_func.graph, '../config', 'trained.pbtxt',
+        tf.io.write_graph(frozen_func.graph, 'config', 'trained.pbtxt',
                           as_text=True)
 
     # define training step function
@@ -193,22 +191,4 @@ class TrainNeuralNetwork:
                      "prob_loss: %4.2f   total_loss: %4.2f" % (self.global_steps, giou_loss, conf_loss,
                                                                    prob_loss, total_loss))
 
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('--weights', required=False, help='path to pretrained weights')
-    parser.add_argument('--tiny', required=False, help='is tiny model')
-
-    args = vars(parser.parse_args())
-
-    weights = args['weights'] if args['weights'] is not None else '../config/yolov3.weights'
-    tiny = args['tiny'] if args['tiny'] is not None else False
-
-    FLAGS = SimpleNamespace(weights=weights, tiny=tiny)
-
-    train = TrainNeuralNetwork()
-    train.train(FLAGS)
-
-    print('The learning is ended successfully!')
 
